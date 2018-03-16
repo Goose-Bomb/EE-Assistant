@@ -1,0 +1,75 @@
+﻿<Grid x:Class="EEAssistant.Views.DataDisplay"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+            xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+            xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+            xmlns:local="clr-namespace:EEAssistant.Views"
+            xmlns:Helpers="clr-namespace:EEAssistant.Helpers"
+            mc:Ignorable="d"
+            d:DesignHeight="480" d:DesignWidth="640"
+            Loaded="DataDisplay_Panel_Loaded">
+
+    <Grid.Resources>
+        <Helpers:VisibilityConverter x:Key="VisibilityConverter"/>
+        <Helpers:NegativeConverter x:Key="NegativeConverter"/>
+    </Grid.Resources>
+
+    <Grid.RowDefinitions>
+        <RowDefinition Height="3*"/>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="4*"/>
+        <ColumnDefinition Width="1*"/>
+    </Grid.ColumnDefinitions>
+
+    <ProgressBar Grid.Row="1" Grid.Column="0" Margin="0,3,3,2" Background="Transparent"
+                 Minimum="0" Maximum="1.0" Value="{Binding TxHandler.SendFileProgress, Mode=OneWay}"
+                 Visibility="{Binding TxHandler.IsImportFile, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
+
+    <TextBox Grid.Row="0" Grid.ColumnSpan="2" Margin="0,1,0,2" 
+             TextWrapping="Wrap" IsReadOnly="True"
+             Text="{Binding RxHandler.DisplayText, Mode=OneWay}"/>
+    
+    <TextBox Grid.Row="1" Grid.Column="0" Margin="0,3,3,2" Background="Transparent"
+             TextWrapping="Wrap" 
+             IsReadOnly="{Binding TxHandler.IsImportFile, Mode=OneWay}"
+             Text="{Binding TxHandler.SendText, Mode=TwoWay}"/>
+
+    <Button x:Name="SendButton" Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" Margin="2,3,1,2"
+            Controls:ButtonHelper.CornerRadius="0" Click="SendButton_Click">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <Path x:Name="SendIcon" Grid.Row="1" Fill="White" Stretch="Uniform" 
+                  Data="F1 M1024,1024z M0,0z M0,1024L106.496,549.888 695.296,513.024 106.496,473.088 -1.4210854715202E-14,-1.13686837721616E-13 1024,512z"/>
+        </Grid>
+    </Button>
+
+    <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Height="32" Orientation="Horizontal"
+                VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="1,2"
+                Background="{DynamicResource AccentColorBrush}"
+                Visibility="{Binding RxHandler.IsRedirectToFile, Mode=OneWay, Converter={StaticResource VisibilityConverter}}">
+        <TextBlock FontSize="14" Text="重定向接收数据至：" VerticalAlignment="Center" Margin="10,0,0,0"/>
+        <TextBlock FontSize="14" Text="{Binding RxHandler.RedirectFilePath}" VerticalAlignment="Center"/>
+
+        <Button Width="20" Height="20" Margin="10,0" Style="{StaticResource IconButton}" ToolTip="修改" Click="EditRedirectFilePathButton_Click">
+            <Button.Background>
+                <ImageBrush ImageSource="/EEAssistant;component/Images/edit.png"/>
+            </Button.Background>
+        </Button>
+    </StackPanel>
+
+    <StackPanel Grid.Row="2" Orientation="Horizontal">
+        <TextBlock FontSize="14" Text="接收字节数："/>
+        <TextBlock Width="96" FontSize="14" Text="{Binding RxHandler.BytesReceived, Mode=OneWay}" />
+        <TextBlock FontSize="14" Text="发送字节数："/>
+        <TextBlock Width="96" FontSize="14" Text="{Binding TxHandler.BytesTransmitted, Mode=OneWay}"/>
+    </StackPanel>
+</Grid>

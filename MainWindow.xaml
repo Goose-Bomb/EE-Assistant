@@ -1,0 +1,65 @@
+﻿<Controls:MetroWindow x:Class="EEAssistant.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:Views="clr-namespace:EEAssistant.Views"
+        xmlns:Helpers="clr-namespace:EEAssistant.Helpers"
+        mc:Ignorable="d" d:DesignHeight="640" d:DesignWidth="960" 
+        MinWidth="640" MinHeight="360" Title="EE助手" Icon="Nullko.ico"
+        RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True"
+        WindowStartupLocation="CenterScreen" GlowBrush="{DynamicResource AccentColorBrush}">
+
+    <Controls:MetroAnimatedSingleRowTabControl DockPanel.Dock="Top">
+        <TabItem Header="串口">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <ScrollViewer 
+                    VerticalScrollBarVisibility="Auto" 
+                    HorizontalScrollBarVisibility="Disabled">
+
+                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="5">
+                        <Views:SerialPortCfg x:Name="SerialPort_PropCfg_Panel"/>
+                        <Views:RxCfg x:Name="SerialPort_RxCfg_Panel" Margin="0,2"/>
+                        <Views:TxCfg x:Name="SerialPort_TxCfg_Panel" Margin="0,3"/>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="字符集编码" FontSize="14" VerticalAlignment="Center" Margin="2"/>
+                            <ComboBox Margin="6,2,0,0" Width="120" 
+                                      ItemsSource="{Binding EncodingSelections, Mode=OneTime}"
+                                      SelectedValue="{Binding EncodingName, Mode=TwoWay}"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <Views:DataDisplay x:Name="SerialPort_DataDisplay_Panel" Grid.Column="1" Margin="0,7,5,3"
+                         ScrollViewer.CanContentScroll="True" 
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+
+            </Grid>
+
+        </TabItem>
+
+        <!--TabItem Header="网络端口">
+                <StackPanel Orientation="Horizontal">
+                    <Views:NetPortCfg x:Name="NetPortCfg_Panel" Margin="2,0"/>
+                </StackPanel>
+            </-->
+
+        <TabItem Header="图片处理">
+            <Views:ImageProcess/>
+        </TabItem>
+
+        <TabItem Header="关于">
+            <Views:About/>
+        </TabItem>
+    </Controls:MetroAnimatedSingleRowTabControl>
+
+</Controls:MetroWindow>

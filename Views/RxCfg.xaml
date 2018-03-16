@@ -1,0 +1,69 @@
+﻿<GroupBox x:Class="EEAssistant.Views.RxCfg"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:Helpers="clr-namespace:EEAssistant.Helpers"
+          Header="接收区设置" Style="{StaticResource MetroGroupBox}" 
+          Width="200" Padding="5,2" Loaded="RxCfg_Panel_Loaded">
+    <Grid >
+
+        <Grid.Resources>
+            <Helpers:NegativeConverter x:Key="NegativeConverter"/>
+        </Grid.Resources>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="27"/>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="48"/>
+        </Grid.RowDefinitions>
+
+        <CheckBox Grid.Row="0" Content="重定向接收数据至文件" FontSize="14"
+                  IsChecked="{Binding IsRedirectToFile, Mode=TwoWay}"/>
+
+        <CheckBox Grid.Row="1" Content="十六进制显示" FontSize="14"
+                  IsChecked="{Binding IsHexDisplay, Mode=TwoWay}"/>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                    IsEnabled="{Binding IsRedirectToFile, Mode=OneWay, Converter={StaticResource NegativeConverter}}">
+            
+            <ToggleButton Width="36" Height="36" Margin="15,0,10,0" IsChecked="{Binding IsDisplayPaused}">
+                <ToggleButton.Style>
+                    <Style TargetType="ToggleButton" BasedOn="{StaticResource IconButton}">
+                        <Style.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="ToolTip" Value="恢复接收显示"/>
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="/EEAssistant;component/Images/play.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter Property="ToolTip" Value="暂停接收显示"/>
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="/EEAssistant;component/Images/pause.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ToggleButton.Style>
+            </ToggleButton>
+
+            <Button Width="36" Height="36" Margin="12,0" Style="{StaticResource IconButton}" ToolTip="清空接收数据" Click="ClearDataButton_Click">
+                <Button.Background>
+                    <ImageBrush ImageSource="/EEAssistant;component/Images/delete.png"/>
+                </Button.Background>
+            </Button>
+
+            <Button Width="36" Height="36" Margin="12,0" Style="{StaticResource IconButton}" ToolTip="保存接收数据" Click="SaveToFileButton_Click">
+                <Button.Background>
+                    <ImageBrush ImageSource="/EEAssistant;component/Images/save.png"/>
+                </Button.Background>
+            </Button>
+
+        </StackPanel>
+
+    </Grid>
+</GroupBox>

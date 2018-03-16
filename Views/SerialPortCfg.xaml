@@ -1,0 +1,86 @@
+﻿<Grid x:Class="EEAssistant.Views.SerialPortCfg"
+            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+            xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+            xmlns:Helpers="clr-namespace:EEAssistant.Helpers"
+            Width="200">
+
+    <Grid.Resources>
+        <Helpers:ParityConverter x:Key="ParityConverter"/>
+        <Helpers:StopBitsConverter x:Key="StopBitsConverter"/>
+
+        <Style TargetType="TextBlock" x:Key="InfoTextBlock" >
+            <Setter Property="Grid.Column" Value="0"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style TargetType="ComboBox" BasedOn="{StaticResource MetroComboBox}">
+            <Setter Property="Grid.Column" Value="1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+
+    </Grid.Resources>
+
+    <Grid.RowDefinitions>
+        <RowDefinition Height="32"/>
+        <RowDefinition Height="32"/>
+        <RowDefinition Height="32"/>
+        <RowDefinition Height="32"/>
+        <RowDefinition Height="32"/>
+        <RowDefinition Height="48"/>
+    </Grid.RowDefinitions>
+
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="72"/>
+        <ColumnDefinition/>
+    </Grid.ColumnDefinitions>
+
+    <TextBlock Grid.Row="0" Style="{StaticResource InfoTextBlock}" Text="串口号"/>
+    <TextBlock Grid.Row="1" Style="{StaticResource InfoTextBlock}" Text="波特率"/>
+    <TextBlock Grid.Row="2" Style="{StaticResource InfoTextBlock}" Text="数据位"/>
+    <TextBlock Grid.Row="3" Style="{StaticResource InfoTextBlock}" Text="校验位"/>
+    <TextBlock Grid.Row="4" Style="{StaticResource InfoTextBlock}" Text="停止位"/>
+
+    <ComboBox Grid.Row="0" ItemsSource="{Binding SerialPortArgs.AvailablePorts}" 
+              SelectedIndex="{Binding SerialPortArgs.SelectedPortIndex}" x:Name="portsBox"/>
+    
+    <ComboBox Grid.Row="1" ItemsSource="{Binding SerialPortArgs.BaudRateValues, Mode=OneTime}" 
+              SelectedValue="{Binding SerialPortArgs.BaudRate}"/>
+    
+    <ComboBox Grid.Row="2" ItemsSource="{Binding SerialPortArgs.DataBitsValues, Mode=OneTime}" 
+              SelectedValue="{Binding SerialPortArgs.DataBits}" />
+    
+    <ComboBox Grid.Row="3" ItemsSource="{Binding SerialPortArgs.ParityValues, Mode=OneTime}" 
+              SelectedValue="{Binding SerialPortArgs.Parity, Converter={StaticResource ParityConverter}}"/>
+    
+    <ComboBox Grid.Row="4" ItemsSource="{Binding SerialPortArgs.StopBitsValues, Mode=OneTime}" 
+              SelectedValue="{Binding SerialPortArgs.StopBits, Converter={StaticResource StopBitsConverter}}"/>
+
+    <ToggleButton  Grid.Row="5" Grid.ColumnSpan="2"
+             Controls:ButtonHelper.CornerRadius="0" 
+             x:Name="SwitchButton" FontSize="16" Margin="0,4" Focusable="False" 
+             IsChecked="{Binding SerialPortArgs.IsOpen}"
+             Checked="SwitchButton_Checked"
+             Unchecked="SwitchButton_Unchecked">
+        <ToggleButton.Style>
+            <Style TargetType="ToggleButton" BasedOn="{StaticResource MetroButton}">
+                <Style.Triggers>
+                    <Trigger Property="IsChecked" Value="True">
+                        <Setter Property="Content" Value="关闭串口"/>
+                        <Setter Property="Background" Value="DeepSkyBlue"/>
+                        <Setter Property="BorderBrush" Value="Black"/>
+                        <Setter Property="BorderThickness" Value="2"/>
+                    </Trigger>
+                    <Trigger Property="IsChecked" Value="False">
+                        <Setter Property="Content" Value="打开串口"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ToggleButton.Style>
+    </ToggleButton>
+
+</Grid>
