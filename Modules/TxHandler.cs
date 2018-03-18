@@ -40,11 +40,11 @@ namespace EEAssistant.Modules
                     {
                         _ImportFileInfo = new FileInfo(_ImportFilePath);
 
-                        if (_ImportFs != null)
+                        if (_ImportFileStream != null)
                         {
-                            _ImportFs.Close();
+                            _ImportFileStream.Close();
                         }
-                        _ImportFs = new FileStream(_ImportFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, BytesPerPacket);
+                        _ImportFileStream = new FileStream(_ImportFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
                         SendText = $"发送文件：\n{_ImportFileInfo.FullName}\n文件大小：{_ImportFileInfo.Length} Bytes";
                     }
@@ -93,7 +93,35 @@ namespace EEAssistant.Modules
         public bool IsAutoTiming
         {
             get => _IsAutoTiming;
-            set { _IsAutoTiming = value; }
+            set
+            {
+                if (value)
+                {
+                    if(_IsImportFile)
+                    {
+                        _TxTimer.Tick += TxTimer_File_Tick;
+                    }
+                    else
+                    {
+                        _TxTimer.Tick += TxTimer_Buffer_Tick;
+                    }
+                }
+                else
+                {
+                    if (_IsImportFile)
+                    {
+                        _TxTimer.Tick -= TxTimer_File_Tick;
+                    }
+                    else
+                    {
+                        _TxTimer.Tick -= TxTimer_Buffer_Tick;
+                    }
+
+                    _TxTimer.Stop();
+                }
+
+                _IsAutoTiming = value;
+            }
         }
 
         [DataMember]
@@ -107,7 +135,12 @@ namespace EEAssistant.Modules
         public int BytesPerPacket
         {
             get => _BytesPerPacket;
-            set { _BytesPerPacket = value; }
+            set
+            {
+                value = (value < 8) ? 8 : value;
+                value = (value > 4096) ? 4096 : value;
+                _BytesPerPacket = value;
+            }
         }
 
         [DataMember]
@@ -131,12 +164,12 @@ namespace EEAssistant.Modules
             set { _TxTimer.Interval = value; }
         }
 
-        public Action<byte[], int, int> PortWrite
+        public Stream BaseStream
         {
-            get => _PortWrite;
+            get => _BaseStream;
             set
             {
-                _PortWrite = value;
+                _BaseStream = value;
             }
         }
 
@@ -144,70 +177,120 @@ namespace EEAssistant.Modules
 
         #region 公共方法
 
-        public void StartTransmit()
+        public async Task TransmitTextAsync()
         {
-            
-            
-            if (IsImportFile)
-            {
+            byte[] buffer = Config.Args.Encoding.GetBytes(_SendText);
 
+            if (_IsAutoTiming)
+            {
+                await _TransmitBuffer.WriteAsync(buffer, 0, buffer.Length);
+                _TxTimer.Start();
             }
             else
             {
-                byte[] buffer = Config.Args.Encoding.GetBytes(SendText);
-            }
-
-            if(IsAutoTiming)
-            {
-                _TxTimer.Tick += TxTimer_Tick;
-                _TxTimer.Start();
+                await _BaseStream.WriteAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                BytesTransmitted += buffer.Length;
             }
         }
 
-        private void TxTimer_Tick(object sender, EventArgs e)
+        public async Task TransmitFileAsync()
         {
-            byte[] buffer = new byte[BytesPerPacket];
-            int bytesCount;
+            SendFileProgress = 0.0;
 
-            if (IsImportFile)
+            if (_IsAutoTiming)
             {
-                SendFileProgress = (double)BytesTransmitted / _ImportFileInfo.Length;
-                bytesCount = _ImportFs.Read(buffer, 0, BytesPerPacket);  
+                _TxTimer.Start();
             }
             else
             {
-                bytesCount = _TransmitBuffer.Read(buffer, 0, BytesPerPacket);
-            }
+                byte[] buffer = new byte[1024];
+                int bytesCount;
 
-            _PortWrite(buffer, 0, bytesCount);
-            BytesTransmitted += bytesCount;
+                MainWindow.SetWindowTitle("正在发送文件");
+                do
+                {
+                    bytesCount = await _ImportFileStream.ReadAsync(buffer, 0, 1024);
+                    await _BaseStream.WriteAsync(buffer, 0, bytesCount);
+
+                    BytesTransmitted += bytesCount;
+                    SendFileProgress += (double)bytesCount / _ImportFileInfo.Length;
+
+                } while (bytesCount != 0);
+
+                _ImportFileStream.Seek(0, SeekOrigin.Begin);
+                MainWindow.SetWindowTitle("文件发送完成");
+            }
         }
 
         #endregion
 
         #region 私有对象
 
+        private static DispatcherTimer _TxTimer = new DispatcherTimer(DispatcherPriority.Background);
+
+        private Stream _BaseStream;
+        private static MemoryStream _TransmitBuffer = new MemoryStream();
+        private FileInfo _ImportFileInfo;
+        private FileStream _ImportFileStream;
+
         private string _SendText;
         private string _ImportFilePath;
         private bool _IsImportFile;
-        private bool _IsRepeat;
         private bool _IsAutoTiming;
+        private bool _IsRepeat;
         private bool _HasAddtionalLineBreak;
         private string _AddtionalLineBreak;
-        private int _BytesTransmitted;
         private int _BytesPerPacket;
+        private int _BytesTransmitted;
         private double _SendFileProgress;
-
-        private Action<byte[], int, int> _PortWrite;
-        private static DispatcherTimer _TxTimer = new DispatcherTimer(DispatcherPriority.Background);
-        private static MemoryStream _TransmitBuffer;
-
-        private FileInfo _ImportFileInfo;
-        private FileStream _ImportFs;
 
         #endregion
 
         #region 私有方法
+
+        private void TxTimer_File_Tick(object sender, EventArgs e)
+        {
+            byte[] buffer = new byte[BytesPerPacket];
+            int bytesCount = _ImportFileStream.Read(buffer, 0, BytesPerPacket);
+            
+            if(bytesCount == 0)
+            {
+                _ImportFileStream.Seek(0, SeekOrigin.Begin);
+
+                if (_IsRepeat)
+                {
+                    SendFileProgress = 0.0;
+                }
+                else
+                {
+                    _TxTimer.Stop();
+                }
+            }
+
+            _BaseStream.Write(buffer, 0, bytesCount);
+            BytesTransmitted += bytesCount;
+            SendFileProgress += (double)bytesCount / _ImportFileInfo.Length;
+        }
+
+        private void TxTimer_Buffer_Tick(object sender, EventArgs e)
+        {
+            byte[] buffer = new byte[BytesPerPacket];
+            int bytesCount = _TransmitBuffer.Read(buffer, 0, BytesPerPacket);
+
+            if (bytesCount == 0)
+            {
+                _TransmitBuffer.Seek(0, SeekOrigin.Begin);
+
+                if (!_IsRepeat)
+                {
+                    _TxTimer.Stop();
+                }
+            }
+
+            _BaseStream.Write(buffer, 0, bytesCount);
+            BytesTransmitted += bytesCount;
+        }
+
         #endregion
 
         #region 公共事件

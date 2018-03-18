@@ -46,12 +46,18 @@ namespace EEAssistant.Views
             {
                 SwitchButton.IsEnabled = false;
                 await Task.Run(() => App.SerialPort.Open());
-                SwitchButton.IsEnabled = true;
+
+                Config.Args.SerialPortArgs.TxHandler.BaseStream = App.SerialPort.BaseStream;
+                Config.Args.SerialPortArgs.RxHandler.BaseStream = App.SerialPort.BaseStream;
             }
             catch (UnauthorizedAccessException)
             {
                 MainWindow.ShowMessage($"{App.SerialPort.PortName} 打开失败", "该串口正在被占用，拒绝访问");
-                return;
+                Config.Args.SerialPortArgs.IsOpen = false;
+            }
+            finally
+            {
+                SwitchButton.IsEnabled = true;
             }
         }
 

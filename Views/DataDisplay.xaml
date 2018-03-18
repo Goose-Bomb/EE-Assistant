@@ -30,12 +30,11 @@
                  Minimum="0" Maximum="1.0" Value="{Binding TxHandler.SendFileProgress, Mode=OneWay}"
                  Visibility="{Binding TxHandler.IsImportFile, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
 
-    <TextBox Grid.Row="0" Grid.ColumnSpan="2" Margin="0,1,0,2" 
-             TextWrapping="Wrap" IsReadOnly="True"
-             Text="{Binding RxHandler.DisplayText, Mode=OneWay}"/>
+    <TextBox x:Name="ReceiveBox"  Grid.Row="0" Grid.ColumnSpan="2" Margin="0,1,0,2" 
+             TextWrapping="Wrap" FontSize="12" IsReadOnly="True" />
     
-    <TextBox Grid.Row="1" Grid.Column="0" Margin="0,3,3,2" Background="Transparent"
-             TextWrapping="Wrap" 
+    <TextBox x:Name="SendBox" Grid.Row="1" Grid.Column="0" Margin="0,3,3,2" Background="Transparent"
+             TextWrapping="Wrap" FontSize="12"
              IsReadOnly="{Binding TxHandler.IsImportFile, Mode=OneWay}"
              Text="{Binding TxHandler.SendText, Mode=TwoWay}"/>
 

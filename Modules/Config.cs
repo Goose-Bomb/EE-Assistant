@@ -9,30 +9,12 @@ namespace EEAssistant.Modules
     [DataContract]
     class ConfigArgs
     {
-        public static string[] EncodingSelections { get; } = { "GBK", "UTF-8", "Unicode", };
+        public static string[] EncodingSelections { get; } = { "ASCII", "GBK", "UTF-8", "Unicode", };
+
+        public Encoding Encoding { get => Encoding.GetEncoding(CodePage); }
 
         [DataMember]
-        public string EncodingName { get; set; }
-
-        public Encoding Encoding
-        {
-            get
-            {
-                switch(EncodingName)
-                {
-                    case "GBK": return Encoding.Default;
-                    case "UTF-8": return Encoding.UTF8;
-                    case "Unicode": return Encoding.Unicode;
-                    default: return Encoding.Default;
-                }
-            }
-            set
-            {
-                if (value == Encoding.Default) EncodingName = "GBK";
-                else if (value == Encoding.UTF8) EncodingName = "UTF-8";
-                else if (value == Encoding.Unicode) EncodingName = "Unicode";
-            }
-        }
+        public int CodePage { get; set; }
 
         [DataMember]
         public SerialPortArgs SerialPortArgs { get; set; }
@@ -60,7 +42,7 @@ namespace EEAssistant.Modules
             {
                 Args = new ConfigArgs
                 {
-                    Encoding = Encoding.Default,
+                    CodePage = 936,
 
                     SerialPortArgs = new SerialPortArgs
                     {

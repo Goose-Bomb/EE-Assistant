@@ -24,24 +24,44 @@ namespace EEAssistant.Views
                 this.portArgs = Config.Args.SerialPortArgs;
             }
             this.DataContext = portArgs;
+
+            portArgs.RxHandler.TextReceived += (string str) =>
+            Dispatcher.Invoke(() =>
+            {
+                ReceiveBox.AppendText(str);
+                ReceiveBox.ScrollToEnd();
+            });
+
+            portArgs.RxHandler.TextCleared += () => ReceiveBox.Clear();
         }
 
-        private void SendButton_Click(object sender, RoutedEventArgs e)
+        private async void SendButton_Click(object sender, RoutedEventArgs e)
         {
             if (portArgs.IsOpen)
             {
-                portArgs.TxHandler.StartTransmit();
+                SendButton.IsEnabled = false;
+
+                if (portArgs.TxHandler.IsImportFile)
+                {
+                    await portArgs.TxHandler.TransmitFileAsync();
+                }
+                else
+                {
+                    await portArgs.TxHandler.TransmitTextAsync();
+                }
+
+                SendButton.IsEnabled = true;
             }
             else
             {
-                if(portArgs  is SerialPortArgs)
+                if (portArgs is SerialPortArgs)
                 {
                     MainWindow.ShowMessage("串口未打开", null);
                 }
                 else
                 {
                     MainWindow.ShowMessage("网络端口未打开", null);
-                }   
+                }
             }
         }
 
@@ -55,7 +75,8 @@ namespace EEAssistant.Views
             if (dialog.ShowDialog() ?? false)
             {
                 portArgs.RxHandler.RedirectFilePath = dialog.FileName;
-            }
+                portArgs.RxHandler.IsRedirectToFile = true;
+            } 
         }
     }
 }

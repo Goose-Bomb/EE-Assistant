@@ -69,25 +69,54 @@ namespace EEAssistant.Helpers
         }
     }
 
-    public class EncodingConverter : IValueConverter
+    public class CodePageConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var encoding = value as Encoding;
-            if (encoding == Encoding.Default) return "GBK";
-            if (encoding == Encoding.UTF8) return "UTF-8";
-            if (encoding == Encoding.Unicode) return "Unicode";
-            return "GBK";
+            switch((int)value)
+            {
+                case 20127: return "ASCII";
+                case 936: return "GBK";
+                case 65001: return "UTF-8";
+                case 1200: return "Unicode";
+                default: return "GBK";
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             switch(value as string)
             {
-                case "GBK": return Encoding.Default;
-                case "UTF-8": return Encoding.UTF8;
-                case "Unicode": return Encoding.Unicode;
-                default: return Encoding.Default;
+                case "ASCII": return 20127;
+                case "GBK": return 936;
+                case "UTF-8": return 65001;
+                case "Unicode": return 1200;
+                default: return 936;
+            }
+        }
+    }
+
+    public class LineBreakConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            switch (value as string)
+            {
+                case "\n": return "\\n (LF)";
+                case "\r": return "\\r (CR)";
+                case "\r\n": return "\\r\\n (CRLF)";
+                default: return null;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            switch (value as string)
+            {
+                case "\\n (LF)": return "\n";
+                case "\\r (CR)": return "\r";
+                case "\\r\\n (CRLF)": return "\r\n";
+                default: return null;
             }
         }
     }

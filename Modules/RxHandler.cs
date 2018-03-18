@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.Serialization;
+using System.Windows.Threading;
 
 namespace EEAssistant.Modules
 {
@@ -13,16 +14,6 @@ namespace EEAssistant.Modules
     class RxHandler : INotifyPropertyChanged
     {
         #region 公共属性
-
-        public string DisplayText
-        {
-            get => _DisplayText;
-            set
-            {
-                _DisplayText = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DisplayText)));
-            }
-        }
 
         public bool IsDisplayPaused
         {
@@ -76,22 +67,22 @@ namespace EEAssistant.Modules
                         else return;
                     }
 
-                    _RedirectedFs = new FileStream(RedirectFilePath, FileMode.Append, FileAccess.Write);
+                    _RedirectedFileStream = new FileStream(RedirectFilePath, FileMode.Append, FileAccess.Write);
                 }
                 else
                 {
-                    if(_RedirectedFs != null)
+                    if(_RedirectedFileStream != null)
                     {
-                        _RedirectedFs.Close();
+                        _RedirectedFileStream.Close();
                     }
 
-                    if (_RecievedData == null)
+                    if(_ReceiveBuffer == null)
                     {
-                        _RecievedData = new List<byte>();
+                        _ReceiveBuffer = new List<byte>();
                     }
                     else
                     {
-                        _RecievedData.Clear();
+                        _ReceiveBuffer.Clear();
                     }
                 }
 
@@ -110,6 +101,16 @@ namespace EEAssistant.Modules
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsHexDisplay)));
             }
         }
+
+        public Stream BaseStream
+        {
+            get => _BaseStream;
+            set
+            {
+                _BaseStream = value;
+                //_BaseStreamReader = new StreamReader(value, Encoding.GetEncoding(Config.Args.CodePage));
+            }
+        }
         #endregion
 
         #region 公共方法
@@ -118,11 +119,11 @@ namespace EEAssistant.Modules
         {
             if (_IsRedirectToFile)
             {
-                _RedirectedFs.Write(data, 0, data.Length);
+                _RedirectedFileStream.Write(data, 0, data.Length);
             }
             else
             {
-                _RecievedData.AddRange(data);
+                _ReceiveBuffer.AddRange(data);
 
                 if (_IsHexDisplay)
                 {
@@ -132,19 +133,18 @@ namespace EEAssistant.Modules
                         sb.Append(b.ToString("X2")).Append(' ');
                     }
 
-                    DisplayText += sb;
+                    TextReceived?.Invoke(sb.ToString());
                 }
                 else
                 {
-                    DisplayText += Config.Args.Encoding.GetString(data);
-                }
+                    TextReceived?.Invoke(Config.Args.Encoding.GetString(data));
+                } 
             }
         }
 
         public void ClearRxData()
         {
-            _RecievedData.Clear();
-            DisplayText = string.Empty;
+            TextCleared?.Invoke();
             BytesReceived = 0;
         }
 
@@ -152,9 +152,10 @@ namespace EEAssistant.Modules
         {
             try
             {
-                var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
-                await fs.WriteAsync(_RecievedData.ToArray(), 0, _RecievedData.Count);
-                fs.Close();
+                using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+                {
+                    await fs.WriteAsync(_ReceiveBuffer.ToArray(), 0, _ReceiveBuffer.Count);
+                }
             }
             catch (UnauthorizedAccessException)
             {
@@ -166,10 +167,10 @@ namespace EEAssistant.Modules
 
         #region 私有对象
 
-        private List<byte> _RecievedData;
-        private FileStream _RedirectedFs;
+        private Stream _BaseStream;
+        private FileStream _RedirectedFileStream;
+        private List<byte> _ReceiveBuffer;
 
-        private string _DisplayText;
         private string _RedirectFilePath;
         private int _BytesReceived;
         private bool _IsDisplayPaused;
@@ -179,11 +180,14 @@ namespace EEAssistant.Modules
         #endregion
 
         #region 私有方法
+
         #endregion
 
         #region 公共事件
 
         public event PropertyChangedEventHandler PropertyChanged;
+        public event Action<string> TextReceived;
+        public event Action TextCleared;
 
         #endregion
     }

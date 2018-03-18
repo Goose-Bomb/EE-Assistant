@@ -9,7 +9,12 @@
         mc:Ignorable="d" d:DesignHeight="640" d:DesignWidth="960" 
         MinWidth="640" MinHeight="360" Title="EE助手" Icon="Nullko.ico"
         RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True"
-        WindowStartupLocation="CenterScreen" GlowBrush="{DynamicResource AccentColorBrush}">
+        WindowStartupLocation="CenterScreen" GlowBrush="{DynamicResource AccentColorBrush}"
+        Loaded="MainWindow_Loaded">
+
+    <Window.Resources>
+        <Helpers:CodePageConverter x:Key="CodePageConverter"/>
+    </Window.Resources>
 
     <Controls:MetroAnimatedSingleRowTabControl DockPanel.Dock="Top">
         <TabItem Header="串口">
@@ -32,7 +37,7 @@
                             <TextBlock Text="字符集编码" FontSize="14" VerticalAlignment="Center" Margin="2"/>
                             <ComboBox Margin="6,2,0,0" Width="120" 
                                       ItemsSource="{Binding EncodingSelections, Mode=OneTime}"
-                                      SelectedValue="{Binding EncodingName, Mode=TwoWay}"/>
+                                      SelectedValue="{Binding CodePage, Mode=TwoWay, Converter={StaticResource CodePageConverter}}"/>
                         </StackPanel>
 
                     </StackPanel>

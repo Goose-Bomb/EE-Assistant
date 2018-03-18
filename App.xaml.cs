@@ -14,7 +14,6 @@ namespace EEAssistant
         protected override void OnStartup(StartupEventArgs e)
         {
             Config.Load();
-            Config.Args.SerialPortArgs.TxHandler.PortWrite = SerialPort.Write;
             SerialPort.DataReceived += _SerialPort_DataReceived;
             base.OnStartup(e);
         }
@@ -28,14 +27,14 @@ namespace EEAssistant
             base.OnExit(e);
         }
 
-        private async void _SerialPort_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        private void _SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             int bytesToRead = SerialPort.BytesToRead;
             Config.Args.SerialPortArgs.RxHandler.BytesReceived += bytesToRead;
 
             byte[] buffer = new byte[bytesToRead];
 
-            await SerialPort.BaseStream.ReadAsync(buffer, 0, bytesToRead);
+            SerialPort.BaseStream.Read(buffer, 0, bytesToRead);
 
             Config.Args.SerialPortArgs.RxHandler.WriteData(buffer);
         }
