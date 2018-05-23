@@ -26,19 +26,19 @@ namespace EEAssistant.Views
         public TxCfg()
         {
             InitializeComponent();
-        }
 
-        private void TxCfg_Panel_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (this.Name.StartsWith("SerialPort"))
+            this.Loaded += (s, e) =>
             {
-                this.portArgs = Config.Args.SerialPortArgs;
-            }
-            /*else
-            {
-                this.portArgs = Config.Args.NetPortArgs;
-            }*/
-            this.DataContext = portArgs.TxHandler;
+                if (this.Name.StartsWith("SerialPort"))
+                {
+                    this.portArgs = Config.Args.SerialPortArgs;
+                }
+                /*else
+                {
+                    this.portArgs = Config.Args.NetPortArgs;
+                }*/
+                this.DataContext = portArgs.TxHandler;
+            };
         }
 
         private void ImportFile_Button_Click(object sender, RoutedEventArgs e)

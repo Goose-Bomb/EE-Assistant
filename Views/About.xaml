@@ -12,7 +12,7 @@
         <ColumnDefinition Width="2.5*"/>
     </Grid.ColumnDefinitions>
     
-    <Image Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="16"
+    <Image Grid.Column="0" VerticalAlignment="Top" Margin="32"
            Source="/EEAssistant;component/Images/about.png" Stretch="Uniform" />
 
     <Viewbox Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="30">
@@ -27,7 +27,7 @@
             <TextBlock Grid.Row="0" Text="EEAssistant v0.3" FontSize="64" Foreground="White" HorizontalAlignment="Left" Margin="16,0"/>
             <TextBlock Grid.Row="1" Text="2018.3" FontSize="32" Foreground="White" HorizontalAlignment="Left" Margin="20,0"/>
             <TextBlock Grid.Row="2" Text="UESTC-电工科协" FontSize="32" Foreground="White" HorizontalAlignment="Left" Margin="20,0"/>
-            <TextBlock Grid.Row="3" Text="https://github.com/Goose-Bomb/EE_Assistant" FontSize="24" Foreground="DodgerBlue" 
+            <TextBlock Grid.Row="3" Text="https://github.com/Goose-Bomb/EE-Assistant" FontSize="24" Foreground="DodgerBlue" 
                    HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0" Cursor="Hand" MouseLeftButtonDown="GithubLink_MouseLeftButtonDown"/>
         </Grid>
     </Viewbox>

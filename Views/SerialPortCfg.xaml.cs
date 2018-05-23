@@ -12,6 +12,7 @@ namespace EEAssistant.Views
         public SerialPortCfg()
         {
             InitializeComponent();
+            this.Loaded += (s, e) => this.DataContext = Config.Args.SerialPortArgs;
         }
 
         /*
@@ -40,19 +41,19 @@ namespace EEAssistant.Views
                 return;
             }
 
-            App.SerialPort.PortName = SerialPortArgs.AvailablePorts[portsBox.SelectedIndex];
+            SerialPortArgs.Instance.PortName = SerialPortArgs.AvailablePorts[portsBox.SelectedIndex];
 
             try
             {
                 SwitchButton.IsEnabled = false;
-                await Task.Run(() => App.SerialPort.Open());
+                await Task.Run(() => SerialPortArgs.Instance.Open());
 
-                Config.Args.SerialPortArgs.TxHandler.BaseStream = App.SerialPort.BaseStream;
-                Config.Args.SerialPortArgs.RxHandler.BaseStream = App.SerialPort.BaseStream;
+                Config.Args.SerialPortArgs.TxHandler.BaseStream = SerialPortArgs.Instance.BaseStream;
+                Config.Args.SerialPortArgs.RxHandler.BaseStream = SerialPortArgs.Instance.BaseStream;
             }
             catch (UnauthorizedAccessException)
             {
-                MainWindow.ShowMessage($"{App.SerialPort.PortName} 打开失败", "该串口正在被占用，拒绝访问");
+                MainWindow.ShowMessage($"{SerialPortArgs.Instance.PortName} 打开失败", "该串口正在被占用，拒绝访问");
                 Config.Args.SerialPortArgs.IsOpen = false;
             }
             finally
@@ -64,7 +65,7 @@ namespace EEAssistant.Views
         private async void SwitchButton_Unchecked(object sender, RoutedEventArgs e)
         {
             SwitchButton.IsEnabled = false;
-            await Task.Run(() => App.SerialPort.Close());
+            await Task.Run(() => SerialPortArgs.Instance.Close());
             SwitchButton.IsEnabled = true;
         }
     }

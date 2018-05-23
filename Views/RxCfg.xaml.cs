@@ -26,19 +26,19 @@ namespace EEAssistant.Views
         public RxCfg()
         {
             InitializeComponent();
-        }
 
-        private void RxCfg_Panel_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (this.Name.StartsWith("SerialPort"))
+            this.Loaded += (s, e) =>
             {
-                this.portArgs = Config.Args.SerialPortArgs;
-            }
-            /*else
-            {
-                this.portArgs = Config.Args.NetPortArgs;
-            }*/
-            this.DataContext = portArgs.RxHandler;
+                if (this.Name.StartsWith("SerialPort"))
+                {
+                    this.portArgs = Config.Args.SerialPortArgs;
+                }
+                /*else
+                {
+                    this.portArgs = Config.Args.NetPortArgs;
+                }*/
+                this.DataContext = portArgs.RxHandler;
+            };
         }
 
         private async void SaveToFileButton_Click(object sender, RoutedEventArgs e)
@@ -54,6 +54,11 @@ namespace EEAssistant.Views
             }
         }
 
-        private void ClearDataButton_Click(object sender, RoutedEventArgs e) => portArgs.RxHandler.ClearRxData();
+        private void ClearDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            portArgs.RxHandler.ClearRxData();
+            portArgs.RxHandler.BytesReceived = 0;
+            portArgs.TxHandler.BytesTransmitted = 0;
+        }
     }
 }

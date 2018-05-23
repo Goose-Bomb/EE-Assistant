@@ -11,6 +11,12 @@ namespace EEAssistant
         public MainWindow()
         {
             InitializeComponent();
+
+            this.Loaded += (s, e) =>
+            {
+                USBPortWatcher.Init(this);
+                this.DataContext = Config.Args;
+            };
         }
 
         public static void SetWindowTitle(string titile)
@@ -21,12 +27,6 @@ namespace EEAssistant
         public static void ShowMessage(string title, string message)
         {
             (Application.Current.MainWindow as MetroWindow).ShowMessageAsync(title, message, MessageDialogStyle.Affirmative);
-        }
-
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            USBPortWatcher.Init(this);
-            this.DataContext = Config.Args;
         }
     }
 }

@@ -4,7 +4,7 @@
           xmlns:Helpers="clr-namespace:EEAssistant.Helpers"
           xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
           Header="发送区设置" Style="{StaticResource MetroGroupBox}" 
-          Width="200" Padding="5,2" Loaded="TxCfg_Panel_Loaded">
+          Width="200" Padding="5,2">
     
     <GroupBox.Resources>
         <Helpers:TimeSpanConverter x:Key="TimeConverter"/>
@@ -58,7 +58,7 @@
                   IsChecked="{Binding IsRepeat, Mode=TwoWay}"
                   Visibility="{Binding IsChecked, ElementName=Timing_CheckBox, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
 
-        <TextBlock Grid.Row="4" Text="单次最多发送" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="14"
+        <TextBlock Grid.Row="4" Text="单次发送字节" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="14"
                    Visibility="{Binding IsChecked, ElementName=Timing_CheckBox, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
 
         <TextBox Grid.Row="4" Grid.Column="1" VerticalAlignment="Center"  Margin="1,5,1,10"

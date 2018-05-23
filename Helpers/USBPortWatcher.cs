@@ -64,7 +64,7 @@ namespace EEAssistant.Helpers
                                 Config.Args.SerialPortArgs.SelectedPortIndex = 0;
                             }
 
-                             if (Config.Args.SerialPortArgs.IsOpen && App.SerialPort.PortName == portName)
+                            if (Config.Args.SerialPortArgs.IsOpen && SerialPortArgs.Instance.PortName == portName)
                             {
                                 Config.Args.SerialPortArgs.IsOpen = false;
                             }

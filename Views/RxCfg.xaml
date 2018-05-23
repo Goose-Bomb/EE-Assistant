@@ -3,7 +3,7 @@
           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
           xmlns:Helpers="clr-namespace:EEAssistant.Helpers"
           Header="接收区设置" Style="{StaticResource MetroGroupBox}" 
-          Width="200" Padding="5,2" Loaded="RxCfg_Panel_Loaded">
+          Width="200" Padding="5,2">
     <Grid >
 
         <Grid.Resources>

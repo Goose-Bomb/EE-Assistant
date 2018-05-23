@@ -15,6 +15,8 @@ namespace EEAssistant.Modules
     {
         #region 公共属性
 
+        public bool IsOpen { set { _IsOpen = value; } }
+
         public static string[] LineBreakSelections { get; } = { "\\n (LF)", "\\r (CR)", "\\r\\n (CRLF)" };
 
         public string SendText
@@ -188,8 +190,8 @@ namespace EEAssistant.Modules
             }
             else
             {
-                await _BaseStream.WriteAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
                 BytesTransmitted += buffer.Length;
+                await _BaseStream.WriteAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
             }
         }
 
@@ -215,7 +217,7 @@ namespace EEAssistant.Modules
                     BytesTransmitted += bytesCount;
                     SendFileProgress += (double)bytesCount / _ImportFileInfo.Length;
 
-                } while (bytesCount != 0);
+                } while (_IsOpen && bytesCount != 0);
 
                 _ImportFileStream.Seek(0, SeekOrigin.Begin);
                 MainWindow.SetWindowTitle("文件发送完成");
@@ -235,6 +237,7 @@ namespace EEAssistant.Modules
 
         private string _SendText;
         private string _ImportFilePath;
+        private bool _IsOpen;
         private bool _IsImportFile;
         private bool _IsAutoTiming;
         private bool _IsRepeat;
@@ -250,6 +253,12 @@ namespace EEAssistant.Modules
 
         private void TxTimer_File_Tick(object sender, EventArgs e)
         {
+            if(!_IsOpen)
+            {
+                _TxTimer.Stop();
+                return;
+            }
+
             byte[] buffer = new byte[BytesPerPacket];
             int bytesCount = _ImportFileStream.Read(buffer, 0, BytesPerPacket);
             
@@ -274,6 +283,12 @@ namespace EEAssistant.Modules
 
         private void TxTimer_Buffer_Tick(object sender, EventArgs e)
         {
+            if (!_IsOpen)
+            {
+                _TxTimer.Stop();
+                return;
+            }
+
             byte[] buffer = new byte[BytesPerPacket];
             int bytesCount = _TransmitBuffer.Read(buffer, 0, BytesPerPacket);
 

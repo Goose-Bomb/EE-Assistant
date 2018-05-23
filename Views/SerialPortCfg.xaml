@@ -45,25 +45,25 @@
     <TextBlock Grid.Row="3" Style="{StaticResource InfoTextBlock}" Text="校验位"/>
     <TextBlock Grid.Row="4" Style="{StaticResource InfoTextBlock}" Text="停止位"/>
 
-    <ComboBox Grid.Row="0" ItemsSource="{Binding SerialPortArgs.AvailablePorts}" 
-              SelectedIndex="{Binding SerialPortArgs.SelectedPortIndex}" x:Name="portsBox"/>
+    <ComboBox Grid.Row="0" ItemsSource="{Binding AvailablePorts}" 
+              SelectedIndex="{Binding SelectedPortIndex, Mode=TwoWay}" x:Name="portsBox"/>
     
-    <ComboBox Grid.Row="1" ItemsSource="{Binding SerialPortArgs.BaudRateValues, Mode=OneTime}" 
-              SelectedValue="{Binding SerialPortArgs.BaudRate}"/>
+    <ComboBox Grid.Row="1" ItemsSource="{Binding BaudRateValues, Mode=OneTime}" 
+              SelectedValue="{Binding BaudRate, Mode=TwoWay}"/>
     
-    <ComboBox Grid.Row="2" ItemsSource="{Binding SerialPortArgs.DataBitsValues, Mode=OneTime}" 
-              SelectedValue="{Binding SerialPortArgs.DataBits}" />
+    <ComboBox Grid.Row="2" ItemsSource="{Binding DataBitsValues, Mode=OneTime}" 
+              SelectedValue="{Binding DataBits, Mode=TwoWay}" />
     
-    <ComboBox Grid.Row="3" ItemsSource="{Binding SerialPortArgs.ParityValues, Mode=OneTime}" 
-              SelectedValue="{Binding SerialPortArgs.Parity, Converter={StaticResource ParityConverter}}"/>
+    <ComboBox Grid.Row="3" ItemsSource="{Binding ParityValues, Mode=OneTime}" 
+              SelectedValue="{Binding Parity, Mode=TwoWay, Converter={StaticResource ParityConverter}}"/>
     
-    <ComboBox Grid.Row="4" ItemsSource="{Binding SerialPortArgs.StopBitsValues, Mode=OneTime}" 
-              SelectedValue="{Binding SerialPortArgs.StopBits, Converter={StaticResource StopBitsConverter}}"/>
+    <ComboBox Grid.Row="4" ItemsSource="{Binding StopBitsValues, Mode=OneTime}" 
+              SelectedValue="{Binding StopBits, Mode=TwoWay, Converter={StaticResource StopBitsConverter}}"/>
 
     <ToggleButton  Grid.Row="5" Grid.ColumnSpan="2"
              Controls:ButtonHelper.CornerRadius="0" 
              x:Name="SwitchButton" FontSize="16" Margin="0,4" Focusable="False" 
-             IsChecked="{Binding SerialPortArgs.IsOpen}"
+             IsChecked="{Binding IsOpen}"
              Checked="SwitchButton_Checked"
              Unchecked="SwitchButton_Unchecked">
         <ToggleButton.Style>

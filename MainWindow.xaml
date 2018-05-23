@@ -9,8 +9,7 @@
         mc:Ignorable="d" d:DesignHeight="640" d:DesignWidth="960" 
         MinWidth="640" MinHeight="360" Title="EE助手" Icon="Nullko.ico"
         RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True"
-        WindowStartupLocation="CenterScreen" GlowBrush="{DynamicResource AccentColorBrush}"
-        Loaded="MainWindow_Loaded">
+        WindowStartupLocation="CenterScreen" GlowBrush="{DynamicResource AccentColorBrush}">
 
     <Window.Resources>
         <Helpers:CodePageConverter x:Key="CodePageConverter"/>
@@ -24,9 +23,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <ScrollViewer 
-                    VerticalScrollBarVisibility="Auto" 
-                    HorizontalScrollBarVisibility="Disabled">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 
                     <StackPanel Grid.Row="0" Grid.Column="0" Margin="5">
                         <Views:SerialPortCfg x:Name="SerialPort_PropCfg_Panel"/>

@@ -23,7 +23,7 @@ namespace EEAssistant.Modules
                 _IsDisplayPaused = value;
             }
         }
-        
+
         public int BytesReceived
         {
             get => _BytesReceived;
@@ -33,7 +33,7 @@ namespace EEAssistant.Modules
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BytesReceived)));
             }
         }
-        
+
         [DataMember(Order = 0)]
         public string RedirectFilePath
         {
@@ -44,7 +44,7 @@ namespace EEAssistant.Modules
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RedirectFilePath)));
             }
         }
-        
+
         [DataMember(Order = 1)]
         public bool IsRedirectToFile
         {
@@ -71,12 +71,12 @@ namespace EEAssistant.Modules
                 }
                 else
                 {
-                    if(_RedirectedFileStream != null)
+                    if (_RedirectedFileStream != null)
                     {
                         _RedirectedFileStream.Close();
                     }
 
-                    if(_ReceiveBuffer == null)
+                    if (_ReceiveBuffer == null)
                     {
                         _ReceiveBuffer = new List<byte>();
                     }
@@ -115,7 +115,19 @@ namespace EEAssistant.Modules
 
         #region 公共方法
 
-        public void WriteData(byte[] data)
+        public void WriteString(string str)
+        {
+            byte[] data = Config.Args.Encoding.GetBytes(str);
+            _ReceiveBuffer.AddRange(data);
+            BytesReceived += data.Length;
+
+            if (!_IsDisplayPaused)
+            {
+                TextReceived?.Invoke(str);
+            }
+        }
+
+        public void WriteBytes(byte[] data)
         {
             if (_IsRedirectToFile)
             {
@@ -125,7 +137,7 @@ namespace EEAssistant.Modules
             {
                 _ReceiveBuffer.AddRange(data);
 
-                if (_IsHexDisplay)
+                if (!_IsDisplayPaused)
                 {
                     var sb = new StringBuilder(data.Length * 3);
                     foreach (var b in data)
@@ -135,17 +147,15 @@ namespace EEAssistant.Modules
 
                     TextReceived?.Invoke(sb.ToString());
                 }
-                else
-                {
-                    TextReceived?.Invoke(Config.Args.Encoding.GetString(data));
-                } 
             }
+
+            BytesReceived += data.Length;
         }
 
         public void ClearRxData()
         {
+            _ReceiveBuffer.Clear();
             TextCleared?.Invoke();
-            BytesReceived = 0;
         }
 
         public async Task SaveRxDataToFile(string path)
@@ -173,6 +183,7 @@ namespace EEAssistant.Modules
 
         private string _RedirectFilePath;
         private int _BytesReceived;
+
         private bool _IsDisplayPaused;
         private bool _IsRedirectToFile;
         private bool _IsHexDisplay;
